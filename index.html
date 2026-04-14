@@ -12,13 +12,16 @@
   --surface:rgba(255,255,255,0.04);
   --surface2:rgba(255,255,255,0.07);
   --border:rgba(255,255,255,0.08);
-  --blue:#3b82f6;
+  --brand:#2596be;
+  --brand-rgba:rgba(37,150,190,1);
+  --brand-hsl:hsl(196,67%,45%);
+  --blue:#2596be;
   --violet:#8b5cf6;
-  --cyan:#06b6d4;
+  --cyan:rgba(37,150,190,0.25);
   --pink:#ec4899;
   --text:#f1f5f9;
   --muted:#94a3b8;
-  --glow-blue:0 0 40px rgba(59,130,246,0.35);
+  --glow-blue:0 0 40px rgba(37,150,190,0.35);
   --glow-violet:0 0 40px rgba(139,92,246,0.35);
 }
 html{scroll-behavior:smooth}
@@ -55,7 +58,7 @@ nav{
 }
 .nav-logo{
   font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
-  background:linear-gradient(90deg,var(--blue),var(--violet));
+  background:linear-gradient(90deg,var(--brand),var(--violet));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   letter-spacing:-.02em;
 }
@@ -63,7 +66,7 @@ nav{
 .nav-links a{color:var(--muted);text-decoration:none;font-size:.875rem;transition:color .2s}
 .nav-links a:hover{color:var(--text)}
 .nav-cta{
-  background:linear-gradient(135deg,var(--blue),var(--violet));
+  background:linear-gradient(135deg,var(--brand),var(--violet));
   border:none;border-radius:8px;padding:.5rem 1.25rem;
   color:#fff;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500;
   cursor:pointer;transition:opacity .2s,transform .15s;
@@ -79,7 +82,7 @@ nav{
   position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;
 }
 .hero-orb.a{width:600px;height:600px;background:rgba(139,92,246,.18);top:-150px;left:-100px}
-.hero-orb.b{width:500px;height:500px;background:rgba(59,130,246,.15);bottom:-100px;right:-80px}
+.hero-orb.b{width:500px;height:500px;background:rgba(37,150,190,.15);bottom:-100px;right:-80px}
 .hero-orb.c{width:300px;height:300px;background:rgba(6,182,212,.12);top:40%;left:50%;transform:translate(-50%,-50%)}
 
 .hero-badge{
@@ -106,7 +109,7 @@ h1.hero-title{
 }
 .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:fadeUp 1s .3s both}
 .btn-primary{
-  background:linear-gradient(135deg,var(--blue),var(--violet));
+  background:linear-gradient(135deg,var(--brand),var(--violet));
   border:none;border-radius:10px;padding:.75rem 2rem;
   color:#fff;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;
   cursor:pointer;transition:transform .15s,box-shadow .2s;
@@ -164,7 +167,7 @@ section{position:relative;padding:6rem 2rem;max-width:1100px;margin:0 auto}
   display:flex;align-items:center;justify-content:center;
   margin:0 auto 1rem;font-size:1.5rem;
 }
-.icon.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.icon.blue{background:rgba(37,150,190,.15);color:var(--brand)}
 .icon.violet{background:rgba(139,92,246,.15);color:var(--violet)}
 .icon.cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
 .flow-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.5rem}
@@ -325,6 +328,158 @@ footer span{color:var(--violet)}
 
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
 .reveal.visible{opacity:1;transform:none}
+
+/* Infographic Slides Styles */
+.slide {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--text);
+}
+.slide h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.slide p {
+    font-size: 1.2em;
+    text-align: center;
+    max-width: 600px;
+}
+.metric-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.card {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 1px solid var(--border);
+    min-width: 150px;
+}
+.chart {
+    width: 80%;
+    max-width: 600px;
+}
+.progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
+}
+.progress-bars div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.progress-bars div div {
+    flex: 1;
+    height: 20px;
+    border-radius: 10px;
+}
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.member {
+    text-align: center;
+}
+.member img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
+}
+.bars div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.bars div div {
+    flex: 1;
+    height: 20px;
+    border-radius: 10px;
+}
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+.value {
+    text-align: center;
+}
+.value svg {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+.slide button {
+    background: linear-gradient(135deg, var(--blue), var(--violet));
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.slide button:hover {
+    transform: translateY(-2px);
+}
+#contactForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    width: 100%;
+}
+#contactForm input, #contactForm textarea {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+}
+#contactForm textarea {
+    height: 100px;
+    resize: vertical;
+}
+#response {
+    margin-top: 10px;
+    color: var(--cyan);
+}
+.gallery {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.gallery img {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
 </style>
 </head>
 <body>
@@ -597,6 +752,162 @@ footer span{color:var(--violet)}
   <p>Powered by <span>AI</span> • Future of Communication &nbsp;·&nbsp; Built with Claude</p>
 </footer>
 
+<!-- Company Infographic Slides -->
+<div class="slide" id="slide1">
+    <h1>Company Overview</h1>
+    <div class="metric-cards">
+        <div class="card">
+            <h2>Founded</h2>
+            <p>2020</p>
+        </div>
+        <div class="card">
+            <h2>Employees</h2>
+            <p>500+</p>
+        </div>
+        <div class="card">
+            <h2>Revenue</h2>
+            <p>$50M</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide2">
+    <h1>Revenue Growth</h1>
+    <div class="chart">
+        <svg width="500" height="300" viewBox="0 0 500 300">
+            <text x="50" y="280" font-size="12" fill="var(--text)">2019</text>
+            <text x="150" y="280" font-size="12" fill="var(--text)">2020</text>
+            <text x="250" y="280" font-size="12" fill="var(--text)">2021</text>
+            <text x="350" y="280" font-size="12" fill="var(--text)">2022</text>
+            <text x="450" y="280" font-size="12" fill="var(--text)">2023</text>
+            <rect x="50" y="250" width="40" height="0" fill="var(--blue)" class="bar" data-height="20">
+                <animate attributeName="height" from="0" to="20" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="250" to="230" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="150" y="220" width="40" height="0" fill="var(--blue)" class="bar" data-height="50">
+                <animate attributeName="height" from="0" to="50" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="220" to="170" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="250" y="200" width="40" height="0" fill="var(--blue)" class="bar" data-height="70">
+                <animate attributeName="height" from="0" to="70" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="200" to="130" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="350" y="180" width="40" height="0" fill="var(--blue)" class="bar" data-height="90">
+                <animate attributeName="height" from="0" to="90" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="180" to="90" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="450" y="160" width="40" height="0" fill="var(--blue)" class="bar" data-height="110">
+                <animate attributeName="height" from="0" to="110" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="160" to="50" dur="1s" fill="freeze"/>
+            </rect>
+        </svg>
+    </div>
+</div>
+
+<div class="slide" id="slide3">
+    <h1>Market Share</h1>
+    <div class="chart">
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <circle cx="150" cy="150" r="100" fill="none" stroke="var(--border)" stroke-width="20"/>
+            <circle cx="150" cy="150" r="100" fill="none" stroke="var(--blue)" stroke-width="20" stroke-dasharray="314" stroke-dashoffset="94" transform="rotate(-90 150 150)"/>
+            <text x="150" y="140" text-anchor="middle" font-size="16" fill="var(--text)">30%</text>
+            <text x="150" y="160" text-anchor="middle" font-size="12" fill="var(--muted)">Market Share</text>
+        </svg>
+    </div>
+</div>
+
+<div class="slide" id="slide4">
+    <h1>Product Lines</h1>
+    <div class="progress-bars">
+        <div>Product A: <div style="width: 80%; background: var(--blue);"></div></div>
+        <div>Product B: <div style="width: 60%; background: var(--violet);"></div></div>
+        <div>Product C: <div style="width: 40%; background: var(--cyan);"></div></div>
+    </div>
+</div>
+
+<div class="slide" id="slide5">
+    <h1>Company Timeline</h1>
+    <ul style="list-style: none; padding: 0; text-align: center;">
+        <li style="margin: 10px 0;">2020: Founded</li>
+        <li style="margin: 10px 0;">2021: First Product Launch</li>
+        <li style="margin: 10px 0;">2022: Expansion</li>
+        <li style="margin: 10px 0;">2023: IPO</li>
+        <li style="margin: 10px 0;">2024: Global Reach</li>
+    </ul>
+</div>
+
+<div class="slide" id="slide6">
+    <h1>Leadership Team</h1>
+    <div class="team-grid">
+        <div class="member">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0idmFyKC0tYmx1ZSkiLz48L3N2Zz4=" alt="CEO">
+            <p>John Doe - CEO</p>
+        </div>
+        <div class="member">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0idmFyKC0tdmlvbGV0KSIvPjwvc3ZnPg==" alt="CTO">
+            <p>Jane Smith - CTO</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide7">
+    <h1>How It Works</h1>
+    <ol style="text-align: center; list-style-position: inside;">
+        <li>Step 1: Sign Up</li>
+        <li>Step 2: Customize</li>
+        <li>Step 3: Integrate</li>
+        <li>Step 4: Launch</li>
+    </ol>
+</div>
+
+<div class="slide" id="slide8">
+    <h1>Global Presence</h1>
+    <div class="bars">
+        <div>USA: <div style="width: 70%; background: var(--blue);"></div></div>
+        <div>Europe: <div style="width: 50%; background: var(--violet);"></div></div>
+        <div>Asia: <div style="width: 30%; background: var(--cyan);"></div></div>
+    </div>
+</div>
+
+<div class="slide" id="slide9">
+    <h1>Core Values</h1>
+    <div class="values-grid">
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--blue)"/></svg>
+            <p>Innovation</p>
+        </div>
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--violet)"/></svg>
+            <p>Integrity</p>
+        </div>
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--cyan)"/></svg>
+            <p>Collaboration</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide11">
+    <h1>Infographic Gallery</h1>
+    <div class="gallery">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSIjMjU5NmJlIi8+PHJlY3QgeD0iMzAiIHk9IjEzMCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOSIvPjxyZWN0IHg9Ijc1IiB5PSI5MCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz48cmVjdCB4PSIxMjAiIHk9IjYwIiB3aWR0aD0iMzAiIGhlaWdodD0iMTIwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNyIvPjx0ZXh0IHg9IjEwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZWVmNmZiIiBmb250LWZhbWlseT0iRE0gU2FucyI+R3JhcGggMTwvdGV4dD48L3N2Zz4=" alt="Infographic 1">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSJoc2woMTk2LDY3JSw0NSUpIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI3MCIgZmlsbD0iIzBlNGY2OSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiMyNTk2YmUiLz48cGF0aCBkPSJNMTAwIDMwIEE3MCA3MCAwIDAgMSAxNzAgMTAwIEwxMDAgMTAwIFoiIGZpbGw9IiNlZWY2ZmIiIG9wYWNpdHk9Ii45Ii8+PHRleHQgeD0iMTAwIiB5PSIxMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJETSBTYW5zIj5Eb251dDwvdGV4dD48L3N2Zz4=" alt="Infographic 2">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSJyZ2JhKDM3LDE1MCwxOTAsLjk1KSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNzAiIHI9IjI1IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz48Y2lyY2xlIGN4PSIxNDAiIGN5PSI3MCIgcj0iMjUiIGZpbGw9IiNlZWY2ZmIiIG9wYWNpdHk9Ii44Ii8+PHJlY3QgeD0iNDAiIHk9IjEyNSIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjg1Ii8+PHRleHQgeD0iMTAwIiB5PSIxODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNlZWY2ZmIiIGZvbnQtZmFtaWx5PSJETSBTYW5zIj5UZWFtPC90ZXh0Pjwvc3ZnPg==" alt="Infographic 3">
+    </div>
+</div>
+
+<div class="slide" id="slide10">
+    <h1>Contact Us</h1>
+    <p>Get in touch for more information.</p>
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <textarea id="message" placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+    <div id="response"></div>
+</div>
+
 <script>
 // ── Scroll reveal ──
 const observer = new IntersectionObserver(entries => {
@@ -686,6 +997,28 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 
 document.getElementById('demoInput').addEventListener('keydown', e => {
   if(e.key==='Enter') sendMessage();
+});
+
+// Contact form submission
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message').value;
+  const responseDiv = document.getElementById('response');
+
+  try {
+    const res = await fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+    const data = await res.json();
+    responseDiv.textContent = data.message;
+    document.getElementById('contactForm').reset();
+  } catch (err) {
+    responseDiv.textContent = 'Error sending message. Please try again.';
+  }
 });
 </script>
 </body>
