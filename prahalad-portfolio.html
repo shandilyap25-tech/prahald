@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prahalad Shandilya — AI Visual Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060810;
+    --surface: rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f2ff;
+    --muted: rgba(200,210,255,0.5);
+    --accent: #4f8eff;
+    --accent2: #a259ff;
+    --neon: #00d4ff;
+    --glow: rgba(79,142,255,0.25);
+    --glow2: rgba(162,89,255,0.2);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  /* BG MESH */
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(79,142,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(162,89,255,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,212,255,0.05) 0%, transparent 60%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ─── NAV ─── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    padding:18px 48px;
+    display:flex;align-items:center;justify-content:space-between;
+    background:rgba(6,8,16,0.7);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo{
+    font-family:'Syne',sans-serif;
+    font-weight:800;font-size:22px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:-0.5px;
+  }
+  .nav-links{display:flex;gap:32px;list-style:none}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{
+    padding:9px 22px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border:none;border-radius:100px;
+    color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+    cursor:pointer;transition:opacity .2s,transform .2s;text-decoration:none;
+  }
+  .nav-cta:hover{opacity:.85;transform:translateY(-1px)}
+
+  /* ─── SECTIONS WRAPPER ─── */
+  main{position:relative;z-index:1}
+
+  /* ─── HERO ─── */
+  .hero{
+    min-height:100vh;
+    display:flex;align-items:center;
+    padding:120px 48px 80px;
+    max-width:1200px;margin:0 auto;
+    gap:64px;
+  }
+  .hero-left{flex:1}
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;border-radius:100px;
+    background:var(--surface);border:1px solid var(--border2);
+    font-size:13px;color:var(--muted);margin-bottom:28px;
+  }
+  .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .hero h1{
+    font-family:'Syne',sans-serif;font-size:clamp(42px,5vw,72px);
+    font-weight:800;line-height:1.1;letter-spacing:-2px;
+    margin-bottom:20px;
+  }
+  .hero h1 span{
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--neon) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero p{
+    font-size:17px;color:var(--muted);line-height:1.7;
+    max-width:480px;margin-bottom:36px;font-weight:300;
+  }
+  .hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+  .btn-primary{
+    padding:13px 28px;border-radius:100px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;text-decoration:none;font-weight:500;font-size:15px;
+    transition:transform .2s,box-shadow .2s;
+    box-shadow:0 8px 32px var(--glow);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px var(--glow)}
+  .btn-ghost{
+    padding:13px 28px;border-radius:100px;
+    border:1px solid var(--border2);background:var(--surface);
+    color:var(--text);text-decoration:none;font-weight:500;font-size:15px;
+    transition:border-color .2s,background .2s;
+  }
+  .btn-ghost:hover{border-color:var(--accent);background:rgba(79,142,255,0.08)}
+
+  .hero-right{
+    flex:0 0 380px;
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .hero-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;padding:24px;
+    backdrop-filter:blur(10px);
+    transition:border-color .3s;
+  }
+  .hero-card:hover{border-color:var(--border2)}
+  .stat-row{display:flex;gap:24px}
+  .stat{flex:1;text-align:center}
+  .stat-num{
+    font-family:'Syne',sans-serif;font-size:32px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--neon));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .profile-avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;
+    margin-bottom:12px;
+    box-shadow:0 0 30px var(--glow2);
+  }
+  .profile-name{font-family:'Syne',sans-serif;font-weight:700;font-size:18px}
+  .profile-title{font-size:13px;color:var(--muted);margin-top:2px}
+  .profile-loc{
+    display:flex;align-items:center;gap:6px;
+    font-size:12px;color:var(--muted);margin-top:8px;
+  }
+
+  /* ─── SECTION COMMON ─── */
+  section{padding:80px 48px;max-width:1200px;margin:0 auto}
+  .section-label{
+    font-size:11px;text-transform:uppercase;letter-spacing:2px;
+    color:var(--accent);font-weight:600;margin-bottom:12px;
+  }
+  .section-title{
+    font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);
+    font-weight:800;letter-spacing:-1.5px;margin-bottom:16px;
+  }
+  .section-sub{font-size:16px;color:var(--muted);max-width:520px;font-weight:300}
+
+  /* ─── SKILLS ─── */
+  .skills-grid{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:40px;
+  }
+  .skill-tag{
+    padding:8px 18px;border-radius:100px;
+    background:var(--surface);border:1px solid var(--border);
+    font-size:13px;color:var(--text);font-weight:400;
+    transition:all .2s;cursor:default;
+  }
+  .skill-tag:hover{
+    border-color:var(--accent);color:var(--accent);
+    background:rgba(79,142,255,0.08);
+    transform:translateY(-2px);
+  }
+  .skill-tag.highlight{
+    border-color:rgba(79,142,255,0.4);
+    color:var(--accent);background:rgba(79,142,255,0.08);
+  }
+
+  /* ─── EDUCATION ─── */
+  .edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:40px}
+  .edu-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;padding:28px;
+    transition:all .3s;position:relative;overflow:hidden;
+  }
+  .edu-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    opacity:0;transition:opacity .3s;
+  }
+  .edu-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+  .edu-card:hover::before{opacity:1}
+  .edu-year{
+    font-size:11px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--accent);font-weight:600;margin-bottom:10px;
+  }
+  .edu-degree{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px}
+  .edu-school{font-size:14px;color:var(--muted)}
+  .edu-score{
+    margin-top:14px;display:inline-block;
+    padding:4px 12px;border-radius:100px;
+    background:rgba(79,142,255,0.1);border:1px solid rgba(79,142,255,0.2);
+    font-size:12px;color:var(--accent);font-weight:600;
+  }
+
+  /* ─── PROJECT FEATURED ─── */
+  .project-featured{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:28px;padding:0;overflow:hidden;
+    margin-top:40px;transition:border-color .3s;
+  }
+  .project-featured:hover{border-color:var(--border2)}
+  .project-header{
+    padding:32px 36px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    flex-wrap:wrap;
+  }
+  .project-meta{}
+  .project-tag{
+    font-size:11px;text-transform:uppercase;letter-spacing:1.5px;
+    color:var(--neon);font-weight:600;margin-bottom:8px;
+  }
+  .project-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px}
+  .project-desc{font-size:14px;color:var(--muted);max-width:520px}
+  .project-links{display:flex;gap:12px}
+  .project-link{
+    padding:9px 20px;border-radius:100px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;text-decoration:none;font-size:13px;font-weight:500;
+    transition:opacity .2s;
+  }
+  .project-link:hover{opacity:.8}
+  .project-link.outline{
+    background:transparent;border:1px solid var(--border2);color:var(--text);
+  }
+  .project-link.outline:hover{border-color:var(--accent)}
+
+  /* ─── LLM INFOGRAPHIC ─── */
+  .infographic{
+    padding:40px 36px;
+    background:linear-gradient(180deg, rgba(6,8,16,0) 0%, rgba(6,8,16,0.3) 100%);
+    min-height:600px;
+  }
+
+  /* Header */
+  .inf-header{text-align:center;margin-bottom:48px;position:relative}
+  .inf-header h2{
+    font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,40px);
+    font-weight:800;letter-spacing:-1px;
+    background:linear-gradient(135deg,#60a5fa,#a78bfa,#22d3ee);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:10px;
+  }
+  .inf-header p{font-size:15px;color:var(--muted)}
+  .brain-svg{
+    width:80px;height:80px;margin:0 auto 16px;display:block;
+    filter:drop-shadow(0 0 20px rgba(79,142,255,0.6));
+    animation:float 4s ease-in-out infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  /* Flow */
+  .inf-flow{
+    display:grid;
+    grid-template-columns:1fr 40px 1fr 40px 1fr;
+    gap:0;align-items:start;
+    margin-bottom:48px;
+  }
+  .inf-node{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--border);
+    border-radius:20px;padding:24px 20px;
+    text-align:center;position:relative;
+    transition:all .3s;
+  }
+  .inf-node:hover{
+    border-color:rgba(79,142,255,0.5);
+    background:rgba(79,142,255,0.06);
+    transform:translateY(-4px);
+  }
+  .inf-node .node-icon{font-size:36px;margin-bottom:10px;display:block}
+  .inf-node .node-title{
+    font-family:'Syne',sans-serif;font-weight:700;font-size:15px;
+    margin-bottom:8px;color:var(--text);
+  }
+  .inf-node .node-desc{font-size:12px;color:var(--muted);line-height:1.6}
+  .node-input{border-color:rgba(79,142,255,0.4)}
+  .node-process{border-color:rgba(162,89,255,0.4)}
+  .node-output{border-color:rgba(0,212,255,0.4)}
+  .chat-bubble{
+    background:rgba(79,142,255,0.15);
+    border:1px solid rgba(79,142,255,0.3);
+    border-radius:12px 12px 12px 0;
+    padding:10px 14px;font-size:13px;
+    margin-top:12px;text-align:left;color:var(--text);
+    animation:typing 2s ease infinite;
+  }
+  .chat-bubble.ai{
+    background:rgba(0,212,255,0.1);
+    border-color:rgba(0,212,255,0.3);
+    border-radius:12px 12px 0 12px;
+    animation:typing-ai 3s ease infinite 1.5s;
+  }
+  @keyframes typing{0%,100%{opacity:1}50%{opacity:.6}}
+  @keyframes typing-ai{0%,100%{opacity:1}50%{opacity:.7}}
+  .cursor{display:inline-block;width:2px;height:14px;background:var(--accent);margin-left:2px;animation:blink 1s step-end infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  .inf-arrow{
+    display:flex;align-items:center;justify-content:center;padding-top:40px;
+  }
+  .arrow-line{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .arrow-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    animation:flow-dot 1.5s ease-in-out infinite;
+  }
+  .arrow-dot:nth-child(2){animation-delay:0.3s}
+  .arrow-dot:nth-child(3){animation-delay:0.6s}
+  @keyframes flow-dot{0%,100%{opacity:.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2);background:var(--neon)}}
+  .arrow-head{
+    width:0;height:0;
+    border-left:7px solid transparent;
+    border-right:7px solid transparent;
+    border-top:10px solid var(--accent);
+    margin-top:4px;
+  }
+
+  /* Process pills */
+  .process-pills{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .pill{
+    padding:7px 12px;border-radius:8px;
+    background:rgba(162,89,255,0.12);
+    border:1px solid rgba(162,89,255,0.25);
+    font-size:11px;color:rgba(200,170,255,0.9);
+    display:flex;align-items:center;gap:8px;
+    animation:glow-pulse 3s ease infinite;
+  }
+  .pill:nth-child(2){animation-delay:1s}
+  .pill:nth-child(3){animation-delay:2s}
+  @keyframes glow-pulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(162,89,255,0.3)}}
+  .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+
+  /* Neural net SVG */
+  .neural-svg{width:100%;height:120px;margin:12px 0}
+
+  /* Features row */
+  .inf-features{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:40px;
+  }
+  .feat-card{
+    background:rgba(255,255,255,0.03);border:1px solid var(--border);
+    border-radius:14px;padding:18px 16px;
+    display:flex;align-items:flex-start;gap:12px;
+    transition:all .3s;
+  }
+  .feat-card:hover{border-color:rgba(79,142,255,0.4);background:rgba(79,142,255,0.05);transform:translateY(-2px)}
+  .feat-icon{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;
+  }
+  .feat-text .feat-title{font-size:13px;font-weight:600;margin-bottom:3px}
+  .feat-text .feat-desc{font-size:11px;color:var(--muted)}
+
+  /* Apps row */
+  .inf-apps{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:32px}
+  .app-chip{
+    padding:10px 18px;border-radius:100px;
+    background:rgba(255,255,255,0.05);border:1px solid var(--border);
+    font-size:13px;color:var(--text);
+    display:flex;align-items:center;gap:8px;
+    transition:all .3s;cursor:default;
+  }
+  .app-chip:hover{
+    border-color:var(--neon);
+    background:rgba(0,212,255,0.08);color:var(--neon);
+    transform:scale(1.05);
+  }
+
+  /* Footer tagline */
+  .inf-footer{
+    text-align:center;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+  }
+  .inf-footer p{
+    font-size:13px;
+    background:linear-gradient(135deg,var(--accent),var(--neon));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  }
+
+  /* ─── CERTIFICATIONS ─── */
+  .cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px}
+  .cert-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:22px;
+    display:flex;align-items:flex-start;gap:16px;
+    transition:all .3s;
+  }
+  .cert-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .cert-icon{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0;
+  }
+  .cert-name{font-weight:600;font-size:15px;margin-bottom:3px}
+  .cert-org{font-size:12px;color:var(--muted)}
+  .cert-date{font-size:11px;color:var(--accent);margin-top:6px;font-weight:500}
+
+  /* ─── CONTACT ─── */
+  .contact-wrap{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:28px;padding:48px;margin-top:40px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:40px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(79,142,255,0.08),rgba(162,89,255,0.06));
+    position:relative;overflow:hidden;
+  }
+  .contact-wrap::before{
+    content:'';position:absolute;
+    top:-100px;right:-100px;
+    width:400px;height:400px;border-radius:50%;
+    background:radial-gradient(circle,rgba(79,142,255,0.1) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .contact-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:10px}
+  .contact-sub{font-size:15px;color:var(--muted);max-width:400px}
+  .contact-links{display:flex;gap:14px;flex-wrap:wrap}
+  .contact-btn{
+    padding:12px 26px;border-radius:100px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;text-decoration:none;font-weight:500;font-size:14px;
+    display:flex;align-items:center;gap:8px;
+    box-shadow:0 8px 24px var(--glow);
+    transition:transform .2s,opacity .2s;
+  }
+  .contact-btn:hover{transform:translateY(-2px);opacity:.9}
+  .contact-btn.ghost{
+    background:transparent;border:1px solid var(--border2);
+    box-shadow:none;color:var(--text);
+  }
+  .contact-btn.ghost:hover{border-color:var(--accent)}
+
+  /* ─── FOOTER ─── */
+  footer{
+    border-top:1px solid var(--border);
+    padding:32px 48px;
+    max-width:1200px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:16px;
+  }
+  .footer-brand{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:18px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .footer-copy{font-size:13px;color:var(--muted)}
+  .footer-github{
+    display:flex;align-items:center;gap:8px;
+    color:var(--muted);text-decoration:none;font-size:13px;
+    transition:color .2s;
+  }
+  .footer-github:hover{color:var(--text)}
+  .github-icon{width:20px;height:20px;fill:currentColor}
+
+  /* ─── ANIMATIONS ─── */
+  .fade-up{
+    opacity:0;transform:translateY(30px);
+    animation:fadeUp .7s ease forwards;
+  }
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  .delay-1{animation-delay:.1s}
+  .delay-2{animation-delay:.2s}
+  .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s}
+
+  /* scroll reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.visible{opacity:1;transform:none}
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:768px){
+    nav{padding:16px 20px}
+    .nav-links{display:none}
+    .hero{flex-direction:column;padding:100px 20px 60px;gap:40px}
+    .hero-right{flex:auto;width:100%}
+    section{padding:60px 20px}
+    .inf-flow{grid-template-columns:1fr;gap:16px}
+    .inf-arrow{transform:rotate(90deg) scale(0.8)}
+    footer{flex-direction:column;align-items:flex-start;padding:24px 20px}
+    .contact-wrap{padding:32px 24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">PS</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:shandilyap25@gmail.com" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<main>
+<div class="hero" id="about">
+  <div class="hero-left">
+    <div class="hero-badge fade-up delay-1">
+      <span class="badge-dot"></span>
+      Available for Freelance & Full-Time
+    </div>
+    <h1 class="fade-up delay-2">
+      Crafting AI <span>Visuals &amp; Data</span> Experiences
+    </h1>
+    <p class="fade-up delay-3">
+      AI Visual Designer &amp; LLM Evaluator based in Nawada, Bihar. I transform complex AI concepts into clear, beautiful, and engaging infographics and data visualizations.
+    </p>
+    <div class="hero-btns fade-up delay-4">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="https://github.com/shandilyap25-tech/prahald.git" target="_blank" class="btn-ghost">GitHub ↗</a>
+    </div>
+  </div>
+  <div class="hero-right fade-up delay-3">
+    <div class="hero-card">
+      <div class="profile-avatar">PS</div>
+      <div class="profile-name">Prahalad Shandilya</div>
+      <div class="profile-title">AI Visual Designer · LLM Evaluator · Infographic Designer</div>
+      <div class="profile-loc">📍 Nawada, Bihar, India</div>
+    </div>
+    <div class="hero-card">
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-num">76%</div>
+          <div class="stat-label">BA English</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">87%</div>
+          <div class="stat-label">Diploma (CS)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">40+</div>
+          <div class="stat-label">WPM Typing</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Core Focus Areas</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span class="skill-tag highlight" style="font-size:12px;padding:5px 12px">AI Image Gen</span>
+        <span class="skill-tag highlight" style="font-size:12px;padding:5px 12px">LLM Evaluation</span>
+        <span class="skill-tag highlight" style="font-size:12px;padding:5px 12px">Data Visualization</span>
+        <span class="skill-tag" style="font-size:12px;padding:5px 12px">Visual Design</span>
+        <span class="skill-tag" style="font-size:12px;padding:5px 12px">Infographics</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="reveal">
+    <div class="section-label">Featured Work</div>
+    <h2 class="section-title">Projects &amp; Achievements</h2>
+    <p class="section-sub">A deep-dive educational infographic explaining how Large Language Models work — built to make AI accessible.</p>
+  </div>
+
+  <div class="project-featured reveal">
+    <div class="project-header">
+      <div class="project-meta">
+        <div class="project-tag">AI Education · Infographic · Visual Design</div>
+        <div class="project-title">LLM — How AI Understands Human Language</div>
+        <div class="project-desc">An animated, interactive infographic explaining Large Language Models — from tokenization to transformer attention — designed in a futuristic glassmorphism style for educators and beginners.</div>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/shandilyap25-tech/prahald.git" target="_blank" class="project-link">View on GitHub ↗</a>
+        <a href="#infographic-live" class="project-link outline">Live Preview ↓</a>
+      </div>
+    </div>
+
+    <!-- THE FULL INFOGRAPHIC -->
+    <div class="infographic" id="infographic-live">
+      <!-- HEADER -->
+      <div class="inf-header">
+        <svg class="brain-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="40" stroke="rgba(79,142,255,0.3)" stroke-width="2"/>
+          <circle cx="50" cy="50" r="28" stroke="rgba(162,89,255,0.4)" stroke-width="1.5"/>
+          <!-- Neural nodes -->
+          <circle cx="50" cy="22" r="4" fill="#4f8eff"/>
+          <circle cx="72" cy="35" r="4" fill="#a259ff"/>
+          <circle cx="72" cy="65" r="4" fill="#00d4ff"/>
+          <circle cx="50" cy="78" r="4" fill="#4f8eff"/>
+          <circle cx="28" cy="65" r="4" fill="#a259ff"/>
+          <circle cx="28" cy="35" r="4" fill="#00d4ff"/>
+          <circle cx="50" cy="50" r="5" fill="#4f8eff"/>
+          <!-- Connections -->
+          <line x1="50" y1="22" x2="50" y2="50" stroke="rgba(79,142,255,0.5)" stroke-width="1"/>
+          <line x1="72" y1="35" x2="50" y2="50" stroke="rgba(162,89,255,0.5)" stroke-width="1"/>
+          <line x1="72" y1="65" x2="50" y2="50" stroke="rgba(0,212,255,0.5)" stroke-width="1"/>
+          <line x1="50" y1="78" x2="50" y2="50" stroke="rgba(79,142,255,0.5)" stroke-width="1"/>
+          <line x1="28" y1="65" x2="50" y2="50" stroke="rgba(162,89,255,0.5)" stroke-width="1"/>
+          <line x1="28" y1="35" x2="50" y2="50" stroke="rgba(0,212,255,0.5)" stroke-width="1"/>
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 50 50" to="360 50 50" dur="20s" repeatCount="indefinite"/>
+        </svg>
+        <h2>How LLM Works</h2>
+        <p>AI that understands and generates human language</p>
+      </div>
+
+      <!-- FLOW: INPUT → PROCESS → OUTPUT -->
+      <div class="inf-flow">
+        <!-- INPUT -->
+        <div class="inf-node node-input">
+          <span class="node-icon">💬</span>
+          <div class="node-title">User Input</div>
+          <div class="node-desc">You type a natural language question or command</div>
+          <div class="chat-bubble">"What is Artificial Intelligence?"<span class="cursor"></span></div>
+        </div>
+
+        <!-- ARROW 1 -->
+        <div class="inf-arrow">
+          <div class="arrow-line">
+            <div class="arrow-dot"></div>
+            <div class="arrow-dot"></div>
+            <div class="arrow-dot"></div>
+            <div class="arrow-head"></div>
+          </div>
+        </div>
+
+        <!-- PROCESSING -->
+        <div class="inf-node node-process">
+          <span class="node-icon">🧠</span>
+          <div class="node-title">AI Processing</div>
+          <div class="node-desc">Transformer layers analyze context and meaning</div>
+          <!-- Neural SVG -->
+          <svg class="neural-svg" viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Layer 1 -->
+            <circle cx="30" cy="25" r="6" fill="rgba(79,142,255,0.8)"/>
+            <circle cx="30" cy="50" r="6" fill="rgba(79,142,255,0.8)"/>
+            <circle cx="30" cy="75" r="6" fill="rgba(79,142,255,0.8)"/>
+            <!-- Layer 2 -->
+            <circle cx="90" cy="20" r="6" fill="rgba(162,89,255,0.8)"/>
+            <circle cx="90" cy="45" r="6" fill="rgba(162,89,255,0.8)"/>
+            <circle cx="90" cy="70" r="6" fill="rgba(162,89,255,0.8)"/>
+            <circle cx="90" cy="90" r="6" fill="rgba(162,89,255,0.8)"/>
+            <!-- Layer 3 -->
+            <circle cx="150" cy="30" r="6" fill="rgba(0,212,255,0.8)"/>
+            <circle cx="150" cy="55" r="6" fill="rgba(0,212,255,0.8)"/>
+            <circle cx="150" cy="80" r="6" fill="rgba(0,212,255,0.8)"/>
+            <!-- Layer 4 -->
+            <circle cx="200" cy="50" r="7" fill="rgba(79,142,255,1)" filter="url(#glow)"/>
+            <!-- Connections L1→L2 -->
+            <line x1="36" y1="25" x2="84" y2="20" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <line x1="36" y1="25" x2="84" y2="45" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <line x1="36" y1="50" x2="84" y2="45" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <line x1="36" y1="50" x2="84" y2="70" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <line x1="36" y1="75" x2="84" y2="70" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <line x1="36" y1="75" x2="84" y2="90" stroke="rgba(79,142,255,0.3)" stroke-width="1"/>
+            <!-- L2→L3 -->
+            <line x1="96" y1="20" x2="144" y2="30" stroke="rgba(162,89,255,0.3)" stroke-width="1"/>
+            <line x1="96" y1="45" x2="144" y2="55" stroke="rgba(162,89,255,0.3)" stroke-width="1"/>
+            <line x1="96" y1="70" x2="144" y2="55" stroke="rgba(162,89,255,0.3)" stroke-width="1"/>
+            <line x1="96" y1="90" x2="144" y2="80" stroke="rgba(162,89,255,0.3)" stroke-width="1"/>
+            <!-- L3→L4 -->
+            <line x1="156" y1="30" x2="193" y2="50" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+            <line x1="156" y1="55" x2="193" y2="50" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+            <line x1="156" y1="80" x2="193" y2="50" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+            <defs>
+              <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+          </svg>
+          <div class="process-pills">
+            <div class="pill"><span class="pill-dot"></span>Tokenization</div>
+            <div class="pill"><span class="pill-dot"></span>Attention Mechanism</div>
+            <div class="pill"><span class="pill-dot"></span>Training on Big Data</div>
+          </div>
+        </div>
+
+        <!-- ARROW 2 -->
+        <div class="inf-arrow">
+          <div class="arrow-line">
+            <div class="arrow-dot"></div>
+            <div class="arrow-dot"></div>
+            <div class="arrow-dot"></div>
+            <div class="arrow-head"></div>
+          </div>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="inf-node node-output">
+          <span class="node-icon">🤖</span>
+          <div class="node-title">AI Output</div>
+          <div class="node-desc">Model generates a coherent, contextual response</div>
+          <div class="chat-bubble ai">"AI is intelligence demonstrated by machines, simulating human thinking..."<span class="cursor" style="background:var(--neon)"></span></div>
+        </div>
+      </div>
+
+      <!-- KEY FEATURES -->
+      <div class="inf-features">
+        <div class="feat-card">
+          <div class="feat-icon">🧩</div>
+          <div class="feat-text">
+            <div class="feat-title">Natural Language Understanding</div>
+            <div class="feat-desc">Comprehends grammar, intent, and meaning</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">✍️</div>
+          <div class="feat-text">
+            <div class="feat-title">Text Generation</div>
+            <div class="feat-desc">Produces fluent, human-like text output</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🎯</div>
+          <div class="feat-text">
+            <div class="feat-title">Context Awareness</div>
+            <div class="feat-desc">Remembers conversation context and intent</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📚</div>
+          <div class="feat-text">
+            <div class="feat-title">Learning from Data</div>
+            <div class="feat-desc">Trained on trillions of words across the web</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REAL WORLD APPS -->
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:16px">Real-World Applications</div>
+        <div class="inf-apps">
+          <span class="app-chip">🤖 Chatbots</span>
+          <span class="app-chip">✍️ Content Writing</span>
+          <span class="app-chip">🌐 Translation</span>
+          <span class="app-chip">💻 Coding Assistant</span>
+          <span class="app-chip">🎧 Customer Support</span>
+          <span class="app-chip">🔍 Search Engines</span>
+        </div>
+      </div>
+
+      <!-- FOOTER TAGLINE -->
+      <div class="inf-footer">
+        <p>⚡ Powered by AI • Future of Communication ⚡</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="reveal">
+    <div class="section-label">Capabilities</div>
+    <h2 class="section-title">Skills &amp; Tools</h2>
+    <p class="section-sub">A wide range spanning AI tools, design, data, and communication technologies.</p>
+  </div>
+  <div class="skills-grid reveal">
+    <span class="skill-tag highlight">AI Image Generation</span>
+    <span class="skill-tag highlight">AI Video Generation</span>
+    <span class="skill-tag highlight">LLM Evaluation</span>
+    <span class="skill-tag highlight">Data Visualization</span>
+    <span class="skill-tag highlight">Visual Design</span>
+    <span class="skill-tag highlight">Infographic Design</span>
+    <span class="skill-tag">AI Voiceover</span>
+    <span class="skill-tag">Artificial Intelligence</span>
+    <span class="skill-tag">AIML</span>
+    <span class="skill-tag">HTML</span>
+    <span class="skill-tag">MS-Excel</span>
+    <span class="skill-tag">MS-Word</span>
+    <span class="skill-tag">MS-PowerPoint</span>
+    <span class="skill-tag">MS-Access</span>
+    <span class="skill-tag">Computer Networking</span>
+    <span class="skill-tag">Digital Marketing</span>
+    <span class="skill-tag">Automation</span>
+    <span class="skill-tag">Fast Typing (40+ WPM)</span>
+    <span class="skill-tag">English Communication</span>
+    <span class="skill-tag">Internet</span>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="reveal">
+    <div class="section-label">Background</div>
+    <h2 class="section-title">Education</h2>
+    <p class="section-sub">Academic foundation across English literature, computer science, and technical applications.</p>
+  </div>
+  <div class="edu-grid reveal">
+    <div class="edu-card">
+      <div class="edu-year">2018 — 2023</div>
+      <div class="edu-degree">B.A. (Hons.) English</div>
+      <div class="edu-school">Magadh University</div>
+      <div class="edu-score">76.76%</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year">2023</div>
+      <div class="edu-degree">Diploma in Computer Application</div>
+      <div class="edu-school">The Computer Institute</div>
+      <div class="edu-score">87.50%</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year">2018</div>
+      <div class="edu-degree">Senior Secondary (XII) — Science</div>
+      <div class="edu-school">Warsi College, Pandey Gangout · BSEB</div>
+      <div class="edu-score">60.60%</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year">2016</div>
+      <div class="edu-degree">Secondary (X)</div>
+      <div class="edu-school">Manas Bharti Educational Complex · CBSE</div>
+      <div class="edu-score">CGPA 9.00 / 10</div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div style="margin-top:48px" class="reveal">
+    <div class="section-label">Certifications</div>
+    <div class="cert-grid">
+      <div class="cert-card">
+        <div class="cert-icon">🗣️</div>
+        <div>
+          <div class="cert-name">English Proficiency (Spoken)</div>
+          <div class="cert-org">British English Institute — Virtual</div>
+          <div class="cert-date">Feb 2025 — Present</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-wrap reveal">
+    <div>
+      <div class="section-label">Get in Touch</div>
+      <div class="contact-title">Let's Build Something Together</div>
+      <div class="contact-sub">Open to AI data annotation, infographic design, LLM evaluation, and visual content projects. Based in Nawada — working globally.</div>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:shandilyap25@gmail.com" class="contact-btn">✉️ shandilyap25@gmail.com</a>
+      <a href="tel:+918210455966" class="contact-btn ghost">📞 +91 8210455966</a>
+      <a href="https://github.com/shandilyap25-tech/prahald.git" target="_blank" class="contact-btn ghost">
+        <svg class="github-icon" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.66-.3-5.46-1.33-5.46-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.22.69.83.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Prahalad Shandilya</div>
+  <div class="footer-copy">© 2025 · AI Visual Designer &amp; LLM Evaluator · Nawada, Bihar</div>
+  <a href="https://github.com/shandilyap25-tech/prahald.git" target="_blank" class="footer-github">
+    <svg class="github-icon" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.66-.3-5.46-1.33-5.46-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.22.69.83.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    shandilyap25-tech
+  </a>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Animated typing in chat bubbles
+const phrases = ["What is Artificial Intelligence?", "How does deep learning work?", "Explain neural networks", "What can LLMs do?"];
+const aiPhrases = ["AI is intelligence demonstrated by machines...", "Deep learning uses multi-layer neural networks...", "Neural networks mimic the human brain's structure...", "LLMs can write, code, translate, and more!"];
+let pi = 0;
+function rotatePhrases(){
+  const bubbles = document.querySelectorAll('.chat-bubble:not(.ai)');
+  const aiBubbles = document.querySelectorAll('.chat-bubble.ai');
+  bubbles.forEach(b => {
+    const span = b.querySelector('.cursor');
+    b.childNodes[0].textContent = '"' + phrases[pi % phrases.length] + '"';
+    if(span) b.appendChild(span);
+  });
+  aiBubbles.forEach(b => {
+    const span = b.querySelector('.cursor');
+    b.childNodes[0].textContent = '"' + aiPhrases[pi % aiPhrases.length] + '"';
+    if(span) b.appendChild(span);
+  });
+  pi++;
+}
+setInterval(rotatePhrases, 4000);
+</script>
+</body>
+</html>
