@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How LLMs Work  AI Explainer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04060f;
+  --surface:rgba(255,255,255,0.04);
+  --surface2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);
+  --brand:#2596be;
+  --brand-rgba:rgba(37,150,190,1);
+  --brand-hsl:hsl(196,67%,45%);
+  --blue:#2596be;
+  --violet:#8b5cf6;
+  --cyan:rgba(37,150,190,0.25);
+  --pink:#ec4899;
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --glow-blue:0 0 40px rgba(37,150,190,0.35);
+  --glow-violet:0 0 40px rgba(139,92,246,0.35);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ── noise overlay ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.4;
+}
+
+/* ── scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--violet);border-radius:3px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;
+  background:rgba(4,6,15,0.75);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+  background:linear-gradient(90deg,var(--brand),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.02em;
+}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.875rem;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{
+  background:linear-gradient(135deg,var(--brand),var(--violet));
+  border:none;border-radius:8px;padding:.5rem 1.25rem;
+  color:#fff;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500;
+  cursor:pointer;transition:opacity .2s,transform .15s;
+}
+.nav-cta:hover{opacity:.85;transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden;
+}
+.hero-orb{
+  position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;
+}
+.hero-orb.a{width:600px;height:600px;background:rgba(139,92,246,.18);top:-150px;left:-100px}
+.hero-orb.b{width:500px;height:500px;background:rgba(37,150,190,.15);bottom:-100px;right:-80px}
+.hero-orb.c{width:300px;height:300px;background:rgba(6,182,212,.12);top:40%;left:50%;transform:translate(-50%,-50%)}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);
+  border-radius:100px;padding:.35rem 1rem;font-size:.8rem;color:var(--violet);
+  margin-bottom:1.5rem;animation:fadeUp .8s both;
+}
+.hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--violet);animation:pulse 2s infinite}
+
+h1.hero-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2.5rem,7vw,5rem);line-height:1.05;
+  letter-spacing:-.04em;margin-bottom:1.25rem;
+  animation:fadeUp .9s .1s both;
+}
+.hero-title .grad{
+  background:linear-gradient(135deg,var(--blue) 20%,var(--violet) 60%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-size:1.1rem;color:var(--muted);max-width:520px;
+  margin:0 auto 2.5rem;animation:fadeUp 1s .2s both;
+}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:fadeUp 1s .3s both}
+.btn-primary{
+  background:linear-gradient(135deg,var(--brand),var(--violet));
+  border:none;border-radius:10px;padding:.75rem 2rem;
+  color:#fff;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;
+  cursor:pointer;transition:transform .15s,box-shadow .2s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(139,92,246,.4)}
+.btn-ghost{
+  background:transparent;border:1px solid var(--border);border-radius:10px;
+  padding:.75rem 2rem;color:var(--text);font-size:1rem;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.btn-ghost:hover{border-color:var(--violet);background:rgba(139,92,246,.08)}
+
+/* ── BRAIN VISUAL ── */
+.brain-wrap{
+  margin-top:3rem;position:relative;width:320px;height:220px;
+  animation:fadeUp 1s .4s both;
+}
+.neural-svg{width:100%;height:100%}
+
+/* ── SECTION WRAPPER ── */
+section{position:relative;padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.section-label{
+  font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);
+  font-weight:500;margin-bottom:.75rem;
+}
+.section-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(1.75rem,3.5vw,2.75rem);letter-spacing:-.03em;
+  margin-bottom:.75rem;line-height:1.1;
+}
+.section-sub{color:var(--muted);font-size:1rem;max-width:540px}
+
+/* ── FLOW ── */
+.flow{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr;
+  align-items:center;gap:0;margin-top:4rem;
+}
+@media(max-width:700px){
+  .flow{grid-template-columns:1fr;gap:1.5rem}
+  .flow-arrow{transform:rotate(90deg)}
+}
+.flow-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:1.75rem 1.5rem;text-align:center;position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s;
+}
+.flow-card:hover{border-color:var(--violet);transform:translateY(-4px)}
+.flow-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0,rgba(139,92,246,.1),transparent 70%);
+  pointer-events:none;
+}
+.flow-card .icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1rem;font-size:1.5rem;
+}
+.icon.blue{background:rgba(37,150,190,.15);color:var(--brand)}
+.icon.violet{background:rgba(139,92,246,.15);color:var(--violet)}
+.icon.cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
+.flow-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.5rem}
+.flow-card p{font-size:.875rem;color:var(--muted);line-height:1.5}
+.flow-arrow{
+  display:flex;align-items:center;justify-content:center;padding:0 .5rem;
+}
+.flow-arrow svg{animation:arrowPulse 1.5s ease-in-out infinite}
+
+/* chat bubbles */
+.chat{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem;text-align:left}
+.chat .bubble{
+  display:inline-block;padding:.45rem .9rem;border-radius:12px;font-size:.8rem;
+  max-width:160px;
+}
+.bubble.user{background:rgba(59,130,246,.2);color:#93c5fd;align-self:flex-end;border-bottom-right-radius:3px}
+.bubble.ai{background:rgba(139,92,246,.2);color:#c4b5fd;align-self:flex-start;border-bottom-left-radius:3px}
+.typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted);margin:0 1px}
+.typing-dot:nth-child(1){animation:dot 1.2s .0s infinite}
+.typing-dot:nth-child(2){animation:dot 1.2s .2s infinite}
+.typing-dot:nth-child(3){animation:dot 1.2s .4s infinite}
+
+/* neural layers */
+.layers{display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem}
+.layer{
+  height:10px;border-radius:5px;
+  background:linear-gradient(90deg,var(--blue),var(--violet));
+  animation:layerPulse 2s ease-in-out infinite;
+}
+.layer:nth-child(2){width:80%;margin:0 auto;animation-delay:.3s}
+.layer:nth-child(3){width:55%;margin:0 auto;animation-delay:.6s}
+.chip{
+  display:inline-block;font-size:.65rem;padding:.2rem .55rem;border-radius:6px;
+  background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.2);margin:.2rem .1rem;
+}
+
+/* ── PROCESSING DEEP DIVE ── */
+.process-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem;
+}
+@media(max-width:700px){.process-grid{grid-template-columns:1fr}}
+.proc-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem;transition:border-color .3s,box-shadow .3s;
+}
+.proc-card:hover{border-color:rgba(59,130,246,.4);box-shadow:var(--glow-blue)}
+.proc-num{
+  font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.5rem;
+}
+.proc-card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.proc-card p{font-size:.875rem;color:var(--muted)}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-top:3rem;
+}
+@media(max-width:600px){.features-grid{grid-template-columns:1fr}}
+.feat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem;display:flex;gap:1rem;align-items:flex-start;
+  transition:border-color .3s,transform .2s;
+}
+.feat-card:hover{border-color:rgba(139,92,246,.4);transform:translateX(4px)}
+.feat-icon{font-size:1.3rem;flex-shrink:0;padding:.4rem;border-radius:10px;background:var(--surface2)}
+.feat-card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.25rem}
+.feat-card p{font-size:.8rem;color:var(--muted)}
+
+/* ── APPS ── */
+.apps-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-top:3rem;
+}
+.app-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem 1rem;text-align:center;transition:border-color .3s,transform .2s,box-shadow .3s;
+  cursor:default;
+}
+.app-card:hover{border-color:var(--cyan);transform:translateY(-4px);box-shadow:0 8px 30px rgba(6,182,212,.2)}
+.app-card .app-icon{font-size:2rem;margin-bottom:.75rem;display:block}
+.app-card span{font-size:.8rem;color:var(--muted)}
+
+/* ── AI DEMO ── */
+.demo-wrap{
+  background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:2rem;margin-top:3.5rem;
+}
+.demo-header{
+  display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;
+  padding-bottom:1rem;border-bottom:1px solid var(--border);
+}
+.demo-dot{width:10px;height:10px;border-radius:50%;background:var(--violet);animation:pulse 2s infinite}
+.demo-header h3{font-family:'Syne',sans-serif;font-weight:700}
+.demo-header .demo-status{font-size:.75rem;color:var(--cyan);margin-left:auto}
+.demo-messages{min-height:200px;display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}
+.msg{display:flex;gap:.75rem;align-items:flex-start;animation:fadeUp .4s both}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;
+}
+.msg.user .msg-avatar{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff}
+.msg.ai .msg-avatar{background:linear-gradient(135deg,var(--violet),var(--pink));color:#fff}
+.msg-bubble{
+  background:var(--surface2);border:1px solid var(--border);border-radius:14px;
+  padding:.75rem 1rem;font-size:.875rem;max-width:75%;line-height:1.6;
+}
+.msg.user .msg-bubble{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.2);color:#bfdbfe}
+.demo-input-row{display:flex;gap:.75rem}
+#demoInput{
+  flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:.7rem 1rem;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+#demoInput:focus{border-color:var(--violet)}
+#demoInput::placeholder{color:var(--muted)}
+#sendBtn{
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  border:none;border-radius:10px;padding:.7rem 1.5rem;
+  color:#fff;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500;
+  cursor:pointer;transition:opacity .2s,transform .15s;white-space:nowrap;
+}
+#sendBtn:hover{opacity:.85;transform:translateY(-1px)}
+#sendBtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.thinking{display:none;gap:.3rem;padding:.75rem 1rem;align-items:center}
+.thinking.active{display:flex}
+.thinking span{font-size:.8rem;color:var(--muted)}
+
+/* ── CTA ── */
+.cta-section{
+  text-align:center;padding:7rem 2rem;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.12) 0%,transparent 70%);
+}
+.cta-section h2{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-.03em;margin-bottom:1rem;
+}
+.cta-section p{color:var(--muted);font-size:1rem;margin-bottom:2rem}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:2rem;
+  border-top:1px solid var(--border);
+  font-size:.8rem;color:var(--muted);
+}
+footer span{color:var(--violet)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+@keyframes dot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+@keyframes arrowPulse{0%,100%{opacity:.4;transform:translateX(0)}50%{opacity:1;transform:translateX(4px)}}
+@keyframes layerPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes nodeGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(139,92,246,.5))}50%{filter:drop-shadow(0 0 8px rgba(139,92,246,.9))}}
+@keyframes lineFlow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}
+@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:none}
+
+/* Infographic Slides Styles */
+.slide {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--text);
+}
+.slide h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.slide p {
+    font-size: 1.2em;
+    text-align: center;
+    max-width: 600px;
+}
+.metric-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.card {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 1px solid var(--border);
+    min-width: 150px;
+}
+.chart {
+    width: 80%;
+    max-width: 600px;
+}
+.progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
+}
+.progress-bars div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.progress-bars div div {
+    flex: 1;
+    height: 20px;
+    border-radius: 10px;
+}
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.member {
+    text-align: center;
+}
+.member img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
+}
+.bars div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.bars div div {
+    flex: 1;
+    height: 20px;
+    border-radius: 10px;
+}
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+.value {
+    text-align: center;
+}
+.value svg {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+.slide button {
+    background: linear-gradient(135deg, var(--blue), var(--violet));
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.slide button:hover {
+    transform: translateY(-2px);
+}
+#contactForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    width: 100%;
+}
+#contactForm input, #contactForm textarea {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+}
+#contactForm textarea {
+    height: 100px;
+    resize: vertical;
+}
+#response {
+    margin-top: 10px;
+    color: var(--cyan);
+}
+.gallery {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.gallery img {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">LLM.AI</div>
+  <ul class="nav-links">
+    <li><a href="#flow">How it Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#demo">Try Demo</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Try Demo ↗</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb a"></div>
+  <div class="hero-orb b"></div>
+  <div class="hero-orb c"></div>
+
+  <div class="hero-badge"><span></span> Large Language Models Explained</div>
+
+  <h1 class="hero-title">
+    How AI<br>
+    <span class="grad">Understands You</span>
+  </h1>
+  <p class="hero-sub">A visual deep-dive into how Large Language Models process, learn, and generate human language — from tokens to transformers.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="document.getElementById('flow').scrollIntoView({behavior:'smooth'})">Explore the Flow</button>
+    <button class="btn-ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Live Demo</button>
+  </div>
+
+  <!-- neural network SVG -->
+  <div class="brain-wrap">
+    <svg class="neural-svg" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="rgba(139,92,246,0.6)"/>
+        </marker>
+      </defs>
+      <!-- connections -->
+      <g stroke="rgba(139,92,246,0.2)" stroke-width="1">
+        <!-- layer 1-2 -->
+        <line x1="60" y1="55" x2="140" y2="40"/><line x1="60" y1="55" x2="140" y2="80"/>
+        <line x1="60" y1="110" x2="140" y2="40"/><line x1="60" y1="110" x2="140" y2="80"/><line x1="60" y1="110" x2="140" y2="120"/>
+        <line x1="60" y1="165" x2="140" y2="80"/><line x1="60" y1="165" x2="140" y2="120"/><line x1="60" y1="165" x2="140" y2="160"/>
+        <!-- layer 2-3 -->
+        <line x1="140" y1="40" x2="220" y2="55"/><line x1="140" y1="40" x2="220" y2="110"/>
+        <line x1="140" y1="80" x2="220" y2="55"/><line x1="140" y1="80" x2="220" y2="110"/><line x1="140" y1="80" x2="220" y2="165"/>
+        <line x1="140" y1="120" x2="220" y2="55"/><line x1="140" y1="120" x2="220" y2="110"/><line x1="140" y1="120" x2="220" y2="165"/>
+        <line x1="140" y1="160" x2="220" y2="110"/><line x1="140" y1="160" x2="220" y2="165"/>
+        <!-- layer 3-4 -->
+        <line x1="220" y1="55" x2="280" y2="80"/><line x1="220" y1="55" x2="280" y2="140"/>
+        <line x1="220" y1="110" x2="280" y2="80"/><line x1="220" y1="110" x2="280" y2="140"/>
+        <line x1="220" y1="165" x2="280" y2="80"/><line x1="220" y1="165" x2="280" y2="140"/>
+      </g>
+      <!-- animated connection -->
+      <line x1="60" y1="110" x2="280" y2="110" stroke="url(#lineGrad)" stroke-width="1.5" stroke-dasharray="8 4" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <defs>
+        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#8b5cf6"/>
+          <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- nodes layer 1 -->
+      <circle cx="60" cy="55" r="10" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="1.5" style="animation:nodeGlow 2s infinite"/>
+      <circle cx="60" cy="110" r="10" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="1.5" style="animation:nodeGlow 2s .3s infinite"/>
+      <circle cx="60" cy="165" r="10" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="1.5" style="animation:nodeGlow 2s .6s infinite"/>
+      <!-- nodes layer 2 -->
+      <circle cx="140" cy="40" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s .1s infinite"/>
+      <circle cx="140" cy="80" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s .4s infinite"/>
+      <circle cx="140" cy="120" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s .7s infinite"/>
+      <circle cx="140" cy="160" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s 1s infinite"/>
+      <!-- nodes layer 3 -->
+      <circle cx="220" cy="55" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s .2s infinite"/>
+      <circle cx="220" cy="110" r="12" fill="rgba(139,92,246,.25)" stroke="#8b5cf6" stroke-width="2" style="animation:nodeGlow 2s .5s infinite"/>
+      <circle cx="220" cy="165" r="10" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" style="animation:nodeGlow 2s .8s infinite"/>
+      <!-- nodes layer 4 (output) -->
+      <circle cx="280" cy="80" r="11" fill="rgba(6,182,212,.15)" stroke="#06b6d4" stroke-width="1.5" style="animation:nodeGlow 2s .3s infinite"/>
+      <circle cx="280" cy="140" r="11" fill="rgba(6,182,212,.15)" stroke="#06b6d4" stroke-width="1.5" style="animation:nodeGlow 2s .6s infinite"/>
+      <!-- labels -->
+      <text x="60" y="195" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.6)" font-family="DM Sans">Input</text>
+      <text x="140" y="195" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.6)" font-family="DM Sans">Hidden</text>
+      <text x="220" y="195" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.6)" font-family="DM Sans">Attention</text>
+      <text x="280" y="195" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.6)" font-family="DM Sans">Output</text>
+    </svg>
+  </div>
+</div>
+
+<!-- FLOW -->
+<section id="flow">
+  <div class="section-label">The Pipeline</div>
+  <h2 class="section-title reveal">From your words<br>to AI's reply</h2>
+  <p class="section-sub reveal">Every message you send travels through three critical stages inside a language model.</p>
+
+  <div class="flow reveal">
+    <!-- Input -->
+    <div class="flow-card">
+      <div class="icon blue">💬</div>
+      <h3>User Input</h3>
+      <p>You type a question or prompt in natural language.</p>
+      <div class="chat">
+        <div class="bubble user" id="typingBubble">What is AI?</div>
+        <div class="bubble ai" style="opacity:.4"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+      </div>
+    </div>
+    <!-- arrow -->
+    <div class="flow-arrow">
+      <svg width="36" height="20" viewBox="0 0 36 20" fill="none">
+        <path d="M0 10h28M22 3l10 7-10 7" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <!-- Processing -->
+    <div class="flow-card">
+      <div class="icon violet">🧠</div>
+      <h3>Processing</h3>
+      <p>Tokenization → Attention → Transformer layers work in sequence.</p>
+      <div style="margin-top:.75rem">
+        <span class="chip">Tokenize</span>
+        <span class="chip">Embed</span>
+        <span class="chip">Attend</span>
+        <span class="chip">Decode</span>
+      </div>
+      <div class="layers" style="margin-top:.75rem">
+        <div class="layer" style="width:100%"></div>
+        <div class="layer"></div>
+        <div class="layer"></div>
+      </div>
+    </div>
+    <!-- arrow -->
+    <div class="flow-arrow">
+      <svg width="36" height="20" viewBox="0 0 36 20" fill="none">
+        <path d="M0 10h28M22 3l10 7-10 7" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <!-- Output -->
+    <div class="flow-card">
+      <div class="icon cyan">✨</div>
+      <h3>AI Output</h3>
+      <p>The model generates a coherent, context-aware response token by token.</p>
+      <div class="chat" style="margin-top:.75rem">
+        <div class="bubble ai" id="outputBubble">AI is the simulation of human intelligence…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEEP DIVE -->
+<section>
+  <div class="section-label">Under the Hood</div>
+  <h2 class="section-title reveal">The Transformer<br>Architecture</h2>
+  <p class="section-sub reveal">Three core mechanisms power every modern LLM.</p>
+
+  <div class="process-grid">
+    <div class="proc-card reveal">
+      <div class="proc-num">01</div>
+      <h3>Tokenization</h3>
+      <p>Text is broken into sub-word tokens — the atomic units the model actually processes. "Running" → ["Run", "##ning"].</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">02</div>
+      <h3>Self-Attention</h3>
+      <p>Each token attends to every other token in the sequence, dynamically weighting which words matter most for context.</p>
+    </div>
+    <div class="proc-card reveal">
+      <div class="proc-num">03</div>
+      <h3>Next-Token Prediction</h3>
+      <p>Trained on hundreds of billions of words, the model learns to predict the most likely next token given the full context.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title reveal">What makes LLMs<br>remarkable</h2>
+  <div class="features-grid">
+    <div class="feat-card reveal">
+      <div class="feat-icon">🔤</div>
+      <div>
+        <h3>Natural Language Understanding</h3>
+        <p>Parses grammar, intent, entities, and sentiment with human-level fluency across hundreds of languages.</p>
+      </div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">✍️</div>
+      <div>
+        <h3>Text Generation</h3>
+        <p>Produces coherent long-form content — essays, code, summaries — by predicting optimal token sequences.</p>
+      </div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🧵</div>
+      <div>
+        <h3>Context Awareness</h3>
+        <p>Maintains a context window spanning thousands of tokens, keeping track of the full conversation thread.</p>
+      </div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">📚</div>
+      <div>
+        <h3>Learning from Data</h3>
+        <p>Pre-trained on diverse internet text, then fine-tuned with RLHF to align with human preferences and safety.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATIONS -->
+<section>
+  <div class="section-label">Real-World Use</div>
+  <h2 class="section-title reveal">Where LLMs live<br>today</h2>
+  <div class="apps-grid">
+    <div class="app-card reveal"><span class="app-icon">🤖</span><span>Chatbots</span></div>
+    <div class="app-card reveal"><span class="app-icon">✍️</span><span>Content Writing</span></div>
+    <div class="app-card reveal"><span class="app-icon">🌍</span><span>Translation</span></div>
+    <div class="app-card reveal"><span class="app-icon">💻</span><span>Coding Assistant</span></div>
+    <div class="app-card reveal"><span class="app-icon">🎧</span><span>Customer Support</span></div>
+    <div class="app-card reveal"><span class="app-icon">📊</span><span>Data Analysis</span></div>
+  </div>
+</section>
+
+<!-- AI DEMO -->
+<section id="demo" style="max-width:700px">
+  <div class="section-label">Interactive Demo</div>
+  <h2 class="section-title reveal">Ask the AI</h2>
+  <p class="section-sub reveal">Powered by Claude — type any question about LLMs and get an AI-generated explanation.</p>
+
+  <div class="demo-wrap reveal">
+    <div class="demo-header">
+      <div class="demo-dot"></div>
+      <h3>LLM Assistant</h3>
+      <span class="demo-status">● Online</span>
+    </div>
+
+    <div class="demo-messages" id="messages">
+      <div class="msg ai">
+        <div class="msg-avatar">AI</div>
+        <div class="msg-bubble">Hello! I'm here to explain how Large Language Models work. Ask me anything — how transformers work, what tokenization means, or how AI generates text. 🧠</div>
+      </div>
+    </div>
+
+    <div class="thinking" id="thinking">
+      <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+      <span style="font-size:.8rem;color:var(--muted);margin-left:.5rem">AI is thinking…</span>
+    </div>
+
+    <div class="demo-input-row">
+      <input id="demoInput" type="text" placeholder="Ask about LLMs, transformers, tokens…" maxlength="200">
+      <button id="sendBtn" onclick="sendMessage()">Ask AI ↗</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2 class="reveal">AI is the<br><span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Future</span></h2>
+  <p class="reveal">The era of natural language as the universal interface has arrived.</p>
+  <div class="reveal" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Try the Demo</button>
+    <button class="btn-ghost" onclick="document.getElementById('flow').scrollIntoView({behavior:'smooth'})">Back to Basics</button>
+  </div>
+</div>
+
+<footer>
+  <p>Powered by <span>AI</span> • Future of Communication &nbsp;·&nbsp; Built with Claude</p>
+</footer>
+
+<!-- Company Infographic Slides -->
+<div class="slide" id="slide1">
+    <h1>Company Overview</h1>
+    <div class="metric-cards">
+        <div class="card">
+            <h2>Founded</h2>
+            <p>2020</p>
+        </div>
+        <div class="card">
+            <h2>Employees</h2>
+            <p>500+</p>
+        </div>
+        <div class="card">
+            <h2>Revenue</h2>
+            <p>$50M</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide2">
+    <h1>Revenue Growth</h1>
+    <div class="chart">
+        <svg width="500" height="300" viewBox="0 0 500 300">
+            <text x="50" y="280" font-size="12" fill="var(--text)">2019</text>
+            <text x="150" y="280" font-size="12" fill="var(--text)">2020</text>
+            <text x="250" y="280" font-size="12" fill="var(--text)">2021</text>
+            <text x="350" y="280" font-size="12" fill="var(--text)">2022</text>
+            <text x="450" y="280" font-size="12" fill="var(--text)">2023</text>
+            <rect x="50" y="250" width="40" height="0" fill="var(--blue)" class="bar" data-height="20">
+                <animate attributeName="height" from="0" to="20" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="250" to="230" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="150" y="220" width="40" height="0" fill="var(--blue)" class="bar" data-height="50">
+                <animate attributeName="height" from="0" to="50" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="220" to="170" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="250" y="200" width="40" height="0" fill="var(--blue)" class="bar" data-height="70">
+                <animate attributeName="height" from="0" to="70" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="200" to="130" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="350" y="180" width="40" height="0" fill="var(--blue)" class="bar" data-height="90">
+                <animate attributeName="height" from="0" to="90" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="180" to="90" dur="1s" fill="freeze"/>
+            </rect>
+            <rect x="450" y="160" width="40" height="0" fill="var(--blue)" class="bar" data-height="110">
+                <animate attributeName="height" from="0" to="110" dur="1s" fill="freeze"/>
+                <animate attributeName="y" from="160" to="50" dur="1s" fill="freeze"/>
+            </rect>
+        </svg>
+    </div>
+</div>
+
+<div class="slide" id="slide3">
+    <h1>Market Share</h1>
+    <div class="chart">
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <circle cx="150" cy="150" r="100" fill="none" stroke="var(--border)" stroke-width="20"/>
+            <circle cx="150" cy="150" r="100" fill="none" stroke="var(--blue)" stroke-width="20" stroke-dasharray="314" stroke-dashoffset="94" transform="rotate(-90 150 150)"/>
+            <text x="150" y="140" text-anchor="middle" font-size="16" fill="var(--text)">30%</text>
+            <text x="150" y="160" text-anchor="middle" font-size="12" fill="var(--muted)">Market Share</text>
+        </svg>
+    </div>
+</div>
+
+<div class="slide" id="slide4">
+    <h1>Product Lines</h1>
+    <div class="progress-bars">
+        <div>Product A: <div style="width: 80%; background: var(--blue);"></div></div>
+        <div>Product B: <div style="width: 60%; background: var(--violet);"></div></div>
+        <div>Product C: <div style="width: 40%; background: var(--cyan);"></div></div>
+    </div>
+</div>
+
+<div class="slide" id="slide5">
+    <h1>Company Timeline</h1>
+    <ul style="list-style: none; padding: 0; text-align: center;">
+        <li style="margin: 10px 0;">2020: Founded</li>
+        <li style="margin: 10px 0;">2021: First Product Launch</li>
+        <li style="margin: 10px 0;">2022: Expansion</li>
+        <li style="margin: 10px 0;">2023: IPO</li>
+        <li style="margin: 10px 0;">2024: Global Reach</li>
+    </ul>
+</div>
+
+<div class="slide" id="slide6">
+    <h1>Leadership Team</h1>
+    <div class="team-grid">
+        <div class="member">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0idmFyKC0tYmx1ZSkiLz48L3N2Zz4=" alt="CEO">
+            <p>John Doe - CEO</p>
+        </div>
+        <div class="member">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0idmFyKC0tdmlvbGV0KSIvPjwvc3ZnPg==" alt="CTO">
+            <p>Jane Smith - CTO</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide7">
+    <h1>How It Works</h1>
+    <ol style="text-align: center; list-style-position: inside;">
+        <li>Step 1: Sign Up</li>
+        <li>Step 2: Customize</li>
+        <li>Step 3: Integrate</li>
+        <li>Step 4: Launch</li>
+    </ol>
+</div>
+
+<div class="slide" id="slide8">
+    <h1>Global Presence</h1>
+    <div class="bars">
+        <div>USA: <div style="width: 70%; background: var(--blue);"></div></div>
+        <div>Europe: <div style="width: 50%; background: var(--violet);"></div></div>
+        <div>Asia: <div style="width: 30%; background: var(--cyan);"></div></div>
+    </div>
+</div>
+
+<div class="slide" id="slide9">
+    <h1>Core Values</h1>
+    <div class="values-grid">
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--blue)"/></svg>
+            <p>Innovation</p>
+        </div>
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--violet)"/></svg>
+            <p>Integrity</p>
+        </div>
+        <div class="value">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="var(--cyan)"/></svg>
+            <p>Collaboration</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide" id="slide11">
+    <h1>Infographic Gallery</h1>
+    <div class="gallery">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSIjMjU5NmJlIi8+PHJlY3QgeD0iMzAiIHk9IjEzMCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOSIvPjxyZWN0IHg9Ijc1IiB5PSI5MCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz48cmVjdCB4PSIxMjAiIHk9IjYwIiB3aWR0aD0iMzAiIGhlaWdodD0iMTIwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNyIvPjx0ZXh0IHg9IjEwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZWVmNmZiIiBmb250LWZhbWlseT0iRE0gU2FucyI+R3JhcGggMTwvdGV4dD48L3N2Zz4=" alt="Infographic 1">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSJoc2woMTk2LDY3JSw0NSUpIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI3MCIgZmlsbD0iIzBlNGY2OSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNDUiIGZpbGw9IiMyNTk2YmUiLz48cGF0aCBkPSJNMTAwIDMwIEE3MCA3MCAwIDAgMSAxNzAgMTAwIEwxMDAgMTAwIFoiIGZpbGw9IiNlZWY2ZmIiIG9wYWNpdHk9Ii45Ii8+PHRleHQgeD0iMTAwIiB5PSIxMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJETSBTYW5zIj5Eb251dDwvdGV4dD48L3N2Zz4=" alt="Infographic 2">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjE2IiBmaWxsPSJyZ2JhKDM3LDE1MCwxOTAsLjk1KSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNzAiIHI9IjI1IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz48Y2lyY2xlIGN4PSIxNDAiIGN5PSI3MCIgcj0iMjUiIGZpbGw9IiNlZWY2ZmIiIG9wYWNpdHk9Ii44Ii8+PHJlY3QgeD0iNDAiIHk9IjEyNSIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjg1Ii8+PHRleHQgeD0iMTAwIiB5PSIxODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNlZWY2ZmIiIGZvbnQtZmFtaWx5PSJETSBTYW5zIj5UZWFtPC90ZXh0Pjwvc3ZnPg==" alt="Infographic 3">
+    </div>
+</div>
+
+<div class="slide" id="slide10">
+    <h1>Contact Us</h1>
+    <p>Get in touch for more information.</p>
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <textarea id="message" placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+    <div id="response"></div>
+</div>
+
+<script>
+// ── Scroll reveal ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, {threshold:.15});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Typing animation for hero bubble ──
+const phrases = ["What is AI?","How do LLMs work?","Explain transformers","What is a token?"];
+let pi=0,ci=0,typing=true;
+const tb = document.getElementById('typingBubble');
+function typeLoop(){
+  if(typing){
+    tb.textContent = phrases[pi].slice(0,ci+1);
+    ci++;
+    if(ci===phrases[pi].length){typing=false;setTimeout(typeLoop,1800);return}
+    setTimeout(typeLoop, 80+Math.random()*40);
+  } else {
+    tb.textContent = phrases[pi].slice(0,ci-1);
+    ci--;
+    if(ci===0){typing=true;pi=(pi+1)%phrases.length;setTimeout(typeLoop,400);return}
+    setTimeout(typeLoop,40);
+  }
+}
+typeLoop();
+
+// ── AI Demo ──
+const SYSTEM = `You are a concise, engaging AI tutor that explains Large Language Models and AI concepts. 
+Keep answers to 2-4 sentences max. Be clear, use simple analogies, and be enthusiastic but not cheesy. 
+No bullet points — respond in natural flowing prose. If asked something unrelated to AI/LLMs, gently steer back.`;
+
+async function sendMessage(){
+  const input = document.getElementById('demoInput');
+  const btn = document.getElementById('sendBtn');
+  const thinking = document.getElementById('thinking');
+  const messages = document.getElementById('messages');
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMessage('user', text);
+  input.value = '';
+  btn.disabled = true;
+  thinking.classList.add('active');
+  messages.scrollTop = messages.scrollHeight;
+
+  const convMsgs = [];
+  messages.querySelectorAll('.msg').forEach(m => {
+    const role = m.classList.contains('user') ? 'user' : 'assistant';
+    const content = m.querySelector('.msg-bubble').textContent;
+    convMsgs.push({role, content});
+  });
+  convMsgs.push({role:'user', content:text});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: SYSTEM,
+        messages: convMsgs
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(c=>c.text||'').join('') || "Sorry, I couldn't generate a response.";
+    thinking.classList.remove('active');
+    addMessage('ai', reply);
+  } catch(err) {
+    thinking.classList.remove('active');
+    addMessage('ai', "Hmm, something went wrong connecting to the AI. Check your network and try again.");
+  }
+  btn.disabled = false;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addMessage(role, text){
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `<div class="msg-avatar">${role==='user'?'You':'AI'}</div><div class="msg-bubble">${escHtml(text)}</div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+document.getElementById('demoInput').addEventListener('keydown', e => {
+  if(e.key==='Enter') sendMessage();
+});
+
+// Contact form submission
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message').value;
+  const responseDiv = document.getElementById('response');
+
+  try {
+    const res = await fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+    const data = await res.json();
+    responseDiv.textContent = data.message;
+    document.getElementById('contactForm').reset();
+  } catch (err) {
+    responseDiv.textContent = 'Error sending message. Please try again.';
+  }
+});
+</script>
+</body>
+</html>
