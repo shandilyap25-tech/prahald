@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Translator Call - Real-Time Language Translation for Video Calls</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7fc;
+            color: #00053D;
+        }
+
+        /* App container */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .top-bar h2 {
+            color: #00053D;
+            margin: 0;
+        }
+
+        .join-btn {
+            background: #2D8CFF;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .join-btn:hover {
+            background: #0B5CFF;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(45, 140, 255, 0.1) 0%, rgba(11, 92, 255, 0.1) 100%);
+            padding: 40px 25px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #00053D;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* Call Setup */
+        .call-setup {
+            background: white;
+            padding: 30px 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .call-setup h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00053D;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+        }
+
+        .form-group button {
+            background: #2D8CFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background: #0B5CFF;
+        }
+
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #2D8CFF;
+        }
+
+        /* Video Section */
+        .video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .video-box {
+            width: 350px;
+            height: 220px;
+            background: #e9f2ff;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2D8CFF;
+            font-weight: bold;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .video-box .placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .control-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            background: #2D8CFF;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            background: #0B5CFF;
+        }
+
+        .control-btn.end {
+            background: #dc3545;
+        }
+
+        .control-btn.end:hover {
+            background: #c82333;
+        }
+
+        .control-btn.active {
+            background: #6c757d;
+        }
+
+        .control-btn.active:hover {
+            background: #5a6268;
+        }
+
+        /* Subtitle */
+        .subtitle {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            background: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .video-container {
+                flex-direction: column;
+            }
+            .video-box {
+                width: 280px;
+                height: 180px;
+            }
+            .form-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .form-group input {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h2>AI Translator Call</h2>
+            <button class="join-btn" onclick="document.getElementById('call').scrollIntoView()">Join Call</button>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Break Language Barriers in Real-Time</h1>
+            <p>Experience seamless communication with AI-powered translation</p>
+        </section>
+
+        <!-- Call Setup -->
+        <section id="call" class="call-setup">
+            <h2>Start Your Translated Call</h2>
+            <div class="form-group">
+                <select id="myLanguage">
+                    <option value="hi">Hindi</option>
+                    <option value="en">English</option>
+                </select>
+                <input id="roomCode" placeholder="Enter room code or leave empty">
+                <button id="joinCall">Join/Create Call</button>
+            </div>
+            <div id="myCode" class="status"></div>
+            <div class="form-group">
+                <input id="email" placeholder="Invite email">
+                <button id="sendInvite">Send Invite</button>
+            </div>
+            <div id="inviteStatus" class="status"></div>
+            <div class="form-group">
+                <button id="copyLink">Copy Call Link</button>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <div class="video-container">
+            <div class="video-box">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="placeholder" id="localPlaceholder">You</div>
+            </div>
+            <div class="video-box">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="placeholder" id="remotePlaceholder">Waiting for participant...</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="mute" class="control-btn"><i class="fas fa-microphone"></i></button>
+            <button id="endCall" class="control-btn end"><i class="fas fa-phone-slash"></i></button>
+            <button id="camera" class="control-btn"><i class="fas fa-video"></i></button>
+        </div>
+
+        <!-- Subtitle -->
+        <div id="subtitle" class="subtitle"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AI Translator Call. Powered by Google AI.</p>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time AI Language Translator for Voice/Video Calls</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Project Title: Real-Time AI Language Translator for Voice/Video Calls</h1>
+    
+    <p>This project is a real-time AI-powered communication system that allows two users to speak in different languages (Hindi and English) while understanding each other instantly during a live call. The system works similar to a Zoom-like platform but with built-in live translation.</p>
+    
+    <p>The core idea is to create a seamless conversation experience where language is no longer a barrier. When one user speaks in Hindi, the system converts it into English and delivers it to the other user, and vice versa.</p>
+    
+    <h2>System Architecture:</h2>
+    
+    <p>The system is divided into three main parts: frontend, backend, and AI processing pipeline.</p>
+    
+    <h3>Frontend:</h3>
+    <p>The frontend is designed as a simple call interface similar to Zoom. It includes features like join call, mute/unmute, and end call. The frontend captures the user's voice using the microphone and streams audio data continuously to the backend using WebRTC or WebSockets. It also plays the translated audio received from the backend and optionally displays subtitles.</p>
+    
+    <h3>Backend:</h3>
+    <p>The backend handles real-time communication and processing. It receives audio streams from users, manages user sessions (rooms), and sends processed audio back to the correct user. It ensures smooth data flow and synchronization between both participants.</p>
+    
+    <h3>AI Processing Pipeline:</h3>
+    <p>The backend processes audio in multiple steps:</p>
+    <ol>
+        <li>Speech-to-Text: Converts incoming voice into text.</li>
+        <li>Translation: Translates text between Hindi and English.</li>
+        <li>Text-to-Speech: Converts translated text back into audio.</li>
+    </ol>
+    <p>This pipeline runs continuously in small chunks to maintain near real-time performance.</p>
+    
+    <h2>Working Flow:</h2>
+    
+    <p>User A speaks → Audio captured → Sent to backend<br>
+    Backend converts speech to text → Translates text → Converts to speech<br>
+    Translated audio is sent to User B<br>
+    User B hears output in their own language</p>
+    
+    <p>The same process happens in reverse for User B.</p>
+    
+    <h2>Key Challenges:</h2>
+    
+    <p>The biggest challenge was maintaining low latency, as real-time communication requires fast processing. Another challenge was preserving context and meaning during translation, especially for longer sentences. Handling continuous streaming without delays and ensuring smooth audio playback was also complex.</p>
+    
+    <h2>Solutions:</h2>
+    
+    <p>To reduce delay, audio was processed in small chunks instead of waiting for full sentences. Each component (speech recognition, translation, speech synthesis) was optimized separately. Context handling was considered to improve translation quality and avoid word-by-word output.</p>
+    
+    <h2>Tech Stack:</h2>
+    
+    <ul>
+        <li>Frontend: HTML, CSS, JavaScript (or React)</li>
+        <li>Backend: Node.js or Python</li>
+        <li>Real-time Communication: WebRTC / WebSockets</li>
+        <li>AI Models: Speech-to-Text (Whisper-like), Translation (LLM/API), Text-to-Speech (TTS engine)</li>
+    </ul>
+    
+    <h2>Outcome:</h2>
+    
+    <p>This project helped in understanding how multiple AI technologies can be integrated into a single real-time application. It improved knowledge of system design, real-time data handling, and building scalable AI-based solutions.</p>
+    
+    <h2>Future Improvements:</h2>
+    
+    <p>Add support for more languages, improve voice quality, reduce latency further, and deploy on cloud for real-world usage.</p>
+</body>
+</html>
